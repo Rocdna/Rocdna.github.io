@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>鼠标跟随</title>
+    <style>
+      * {
+        padding: 0;
+        margin: 0;
+        /* 改变光标的样式 */
+        cursor: url(../image/dot1.png), auto;
+      }
+      /* 文本选中 */
+      ::selection {
+        color: rgb(242, 242, 242);
+        background-color: rgb(134, 134, 134);
+      }
+      ul,
+      li {
+        list-style: none;
+      }
+      a {
+        text-decoration: none;
+        color: rgb(226, 226, 226);
+      }
+      .container {
+        position: relative;
+        width: 100%;
+        height: 100vh;
+        background: url(../image/bgumg.jpg) no-repeat center/ cover;
+        overflow: hidden;
+      }
+      .dot {
+        position: fixed;
+        width: 35px;
+        height: 35px;
+        border: 1px solid white;
+        box-shadow: 1px 1px 15px rgba(255, 255, 255, 0.174);
+        border-radius: 50%;
+        background-color: transparent;
+        /* 用 all 光标移动会有问题 */
+        transition: width 0.5s linear, height 0.5s linear, background-color 0.5s linear;
+        /* transition: all .5s linear; */
+        user-select: none;
+        z-index: 2;
+        /* 取消 这个区域内的鼠标事件 */
+        pointer-events: none; 
+      }
+      .doti {
+        position: fixed;
+        width: 950px;
+        height: 950px;
+        user-select: none;
+        z-index: 1;
+        pointer-events: none;
+        display: none;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+      }
+      .dot > p {
+        position: absolute;
+        width: 0px;
+        height: 0px;
+        border: 0px solid white;
+        border-radius: 50%;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+      .item {
+        position: absolute;
+        top: -10px;
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background-color: rgb(212, 211, 211);
+        filter: blur(1px);
+      }
+      .box {
+        position: relative;
+        margin: 50px 0;
+        display: flex;
+        overflow: hidden;
+      }
+      .container .box > ul {
+        width: 700px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      ul > li {
+        max-width: 700px;
+        width: 100%;
+        height: 110px;
+        border-bottom: 1px solid;
+        border-image: linear-gradient(90deg, #717171 0%, #00000000 100%) 2 2 2 2;
+        font-size: 33px;
+        font-family: "zihun125hao-jiuzhouzhenshu";
+        box-sizing: border-box;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        z-index: 2;
+      }
+      ul > li:last-child {
+        border: none;
+      }
+      ul > li a {
+        margin-right: 80px;
+        color: #b1b1b1;
+        transition: all 0.5s linear;
+      }
+      ul > li:hover a {
+        color: rgb(221, 221, 221);
+      }
+      /* 一下是镂空文本特效 */
+      ul > li:nth-child(1):hover a span::before,
+      ul > li:nth-child(2):hover a span::before,
+      ul > li:nth-child(3):hover a span::before,
+      ul > li:nth-child(4):hover a span::before,
+      ul > li:nth-child(5):hover a span::before,
+      ul > li:nth-child(6):hover a span::before {
+        animation: animate .8s ease 0s 1 forwards;
+      }
+      ul > li:nth-child(1) a span::before {
+        content: 'ORIGINIUMS';
+        margin-left: -230px;
+      }
+      ul > li:nth-child(2) a span::before {
+        content: 'ORIGINIUM ARTS';
+        margin-left: -330px;
+      }
+      ul > li:nth-child(3) a span::before {
+        content: 'REUNION';
+        margin-left: -170px;
+      }
+      ul > li:nth-child(4) a span::before {
+        content: 'INFECTED';
+        margin-left: -190px;
+      }
+      ul > li:nth-child(5) a span::before {
+        content: 'NOMADIC CITY';
+        margin-left: -290px;
+      }
+      ul > li:nth-child(6) a span::before {
+        content: 'RHODES ISLAND';
+        margin-left: -320px;
+      }
+      ul > li a span::before {
+        position: absolute;
+        margin-top: -25px;
+        color: rgba(0, 0, 0, 0.03);
+        opacity: 0;
+        letter-spacing: 3px;
+        font-size: 80px;
+        /* text-shadow 生成的镂空字效果不强 */
+        text-shadow: 2px 2px 0 rgba(179, 179, 179, 0.114), -2px -2px 0 rgba(176, 176, 176, 0.129);
+      }
+      @keyframes animate {
+            0% {
+                transform: translateX(80px);
+                opacity: 0;
+            }
+            100% {
+                transform: translateX(0px);
+                opacity: 1;
+            }
+        }
+    </style>
+  </head>
+  <body>
+    <div class="dot"><p></p></div>
+    <div class="doti"></div>
+    <div class="container">
+      <div class="box">
+        <ul>
+          <li>
+            <a href="javascript:0">源石 <span>ORIGINIUMS</span></a>
+          </li>
+          <li>
+            <a href="javascript:0">源石技艺 <span>ORIGINIUM ARTS</span></a>
+          </li>
+          <li>
+            <a href="javascript:0">整合运动 <span>REUNION</span></a>
+          </li>
+          <li>
+            <a href="javascript:0">感染者 <span>INFECTED</span></a>
+          </li>
+          <li>
+            <a href="javascript:0">移动城邦 <span>NOMADIC CITY</span></a>
+          </li>
+          <li>
+            <a href="javascript:0">罗德岛 <span>RHODES ISLAND</span></a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <!-- 引入 jQuery 库 -->
+    <script src="../jq/jQuery.js"></script>
+    <!-- <script src="./js/luan.js"></script> -->
+    <script>
+      // 鼠标跟随 给每一个 li 绑定事件
+      [...$(".box > ul").find("li")].forEach((item, index) => {
+        item.className = index + 1
+        let flag = true
+        $(".box>ul>li")
+          .eq(index)
+          .hover(
+            function () {
+              // 乱符 字体 特效
+              // 节流 镂空字体特效 用 css 伪元素写的 也可用 js 
+              if (!flag) return
+              flag = false
+              // 传入需要改变文本的 标签
+              new Randomchar($(this).find('span')[0])
+              setTimeout(() => {
+                flag = true
+              }, 1000)
+            },
+            function () {}
+          );
+      });
+      // 
+      document.onmousemove = function (e) {
+        const target = e.target
+        let x = e.clientX; // 相对于视窗的 获取 光标的 坐标
+        let y = e.clientY;
+        // 获取 ul 的一些 属性
+        let ulleft = $('.box > ul').offset().left
+        let ultop = $('.box > ul').offset().top
+        let ulwidth = $('.box > ul').width()
+        let ulheight = $('.box > ul').height()
+        // 背景跟随 移动背景的距离 使光标出于中心位置
+        let sub = ($(".dot").width() - 3) / 2;
+        let subi = ($('.doti').width() - 3) / 2
+        //不同 li 不同的背景
+        let imgStr = `url(../image/p${ e.target.className }.png`
+        // 白点光标
+        $(".dot").css("top", y - sub);
+        $(".dot").css("left", x - sub);
+        // 设置 延迟定时器 使跟随更灵动
+        setTimeout(() => {
+          // 背景图光标
+          $('.doti')
+          .css('top', y - subi)
+          .css('left', x - subi)
+          .css('display', 'block')
+          if (target.nodeName === 'LI') {
+            // 更改背景图
+            $('.doti').css('background-image', imgStr)
+          }
+          // 超出 ul 区域 则取消背景图
+          if (x < ulleft || x > ulleft + ulwidth || y < ultop || y > ultop + ulheight ) {
+            $('.doti').css('display', 'none')
+          }
+        }, 120)
+      };
+
+      // 移入移出 ul 鼠标圆点变化
+      $(".box > ul").hover(
+        // 移入
+        function () {
+          $(".dot")
+            .css("width", 27)
+            .css("height", 27)
+            .css("background-color", "#d7d7d791");
+        },
+        // 移出
+        function () {
+          $(".dot")
+            .css("width", 35)
+            .css("height", 35)
+            .css("background-color", "transparent");
+        }
+      );
+
+      // 点击特效 光圈
+      // 开关 节流阀
+      let flag = true;
+      $(".container").on("click", function () {
+        // 节流开关
+        if (!flag) return;
+        flag = false;
+        $(".dot > p").animate(
+          {
+            width: 85,
+            height: 85,
+            borderWidth: 4,
+            opacity: 0,
+          },
+          600,
+          function () {
+            flag = true; // 动画结束后 打开开关
+            $(".dot > p")
+              .css("opacity", 1)
+              .css("width", 0)
+              .css("height", 0)
+              .css("borderWidth", 0);
+          }
+        );
+      });
+
+      // 指定范围内随机取数
+      function randomNum(min, max) {
+        let re = Math.floor(Math.random() * (max - min + 1));
+        return re + min;
+      }
+
+      // 粒子漂浮
+      class Parta {
+        constructor(ele) {
+          this.ele = document.querySelector(ele);
+          this.width = this.ele.offsetWidth;
+          this.height = this.ele.offsetHeight;
+          this.starnum = 50; // 漂浮的粒子数目
+          this.timer = null;  
+          this.init(); 
+        }
+        // 启动器
+        init() {
+          this.creParticles();
+          this.changesize();
+        }
+
+        // 创造 粒子
+        creParticles(lev) {
+          for (let i = 1; i <= this.starnum; i++) {
+            this.startw = (randomNum(10, 90) / 100) * this.width; // 粒子出现的 水平 初始位置
+            this.starth = (randomNum(80, 90) / 100) * this.height; // 粒子出现的 垂直 初始位置
+            this.endw = (randomNum(20, 90) / 100) * this.width; // 粒子消失的 水平 初始位置
+            this.endh = (randomNum(0, 15) / 100) * this.height; // 粒子消失的 垂直 初始位置
+            // 创建 粒子
+            this.star = document.createElement("div");
+            this.star.setAttribute("class", "item"); // 给 star 添加类名
+            this.ele.appendChild(this.star);  // 加入到 ele 中
+            // ele.animate([
+            //    { 第一帧动画 },
+            //    { 第二帧动画 },
+            //    ....
+            //  ],
+            //  {
+                  //动画属性 
+                  // duration  动画时间
+                  // fill 结束时 是否保留最后一帧
+                  // delay 动画延迟开始
+                  // easing  动画运动曲线
+            //  } 
+            //)
+            this.star.animate( // 动画  
+              [
+                {
+                  transform:
+                    "translate3d(" +
+                    this.startw +
+                    "px, " +
+                    this.starth +
+                    "px, 0)",
+                  opacity: randomNum(0, 1),
+                },
+                {
+                  transform:
+                    "translate3d(" + this.endw + "px, " + this.endh + "px, 0)",
+                  opacity: randomNum(0, 1),
+                },
+              ],
+              {
+                duration: 1000 * randomNum(12, 20),
+                delay: 10000 * Math.random(),
+                iterations: Infinity,
+              }
+            );
+
+            // 清除上一组的 粒子
+            if (lev > 1) {
+              this.ele.removeChild(this.ele.children[i]);
+            }
+          }
+        }
+
+        // 视窗改变
+        changesize() {
+          const _this = this; // 保存 this 指向
+          let lev = 1; // 一组 粒子
+          window.onresize = function () {
+            // 防抖 
+            if (_this.timer) clearTimeout(_this.timer);
+            _this.timer = setTimeout(() => {
+              lev++;
+              _this.width = this.innerWidth;
+              _this.height = this.innerHeight;
+              _this.creParticles.call(_this, lev);
+            }, 500);
+          };
+        }
+      }
+      // 粒子漂浮
+      new Parta(".container");
+
+      // 字体 乱符特效
+      class Randomchar {
+        constructor(ele) {
+          this.ele = ele
+          // 拿到 需要改变的字符串
+          this.text = this.ele.innerText
+          this.timer = null;
+          this.arr = ["-", "+", "=", "#", "!", "$", "&", "%", ">", "<", "?"];
+          this.changeText(this.text)
+        }
+        // 多少字 有 多少效果
+        changeChar(str) {
+          let res = str.split(""); // 切割字符串
+          // 当文字小于四个时 全部都给特效
+          if (res.length <= 4 && res.length > 0) {
+            for (let i = 0; i < res.length; i++) {
+              res[i] = this.arr[Math.floor(Math.random() * this.arr.length)];
+            }
+          } else if (res.length === 5) {
+            // 当文字等于 5 时 改 后 3 个
+            for (let i = res.length - 1; i > 1; i--) {
+              res[i] = this.arr[Math.floor(Math.random() * this.arr.length)];
+            }
+          } else if (res.length > 5) {
+            // 当文字大于 五 个时
+            for (let i = res.length - 1; i > 1; i--) {
+              res[i] = this.arr[Math.floor(Math.random() * this.arr.length)];
+            }
+          }
+          // 拼接 返回
+          return res.join("");
+        }
+
+        // 效果
+        changeText(str) {
+          let lev = 0;
+          this.timer = setInterval(() => {
+            lev++;
+            this.ele.innerText = this.changeChar(str);
+            if (lev > 10) {
+              clearInterval(this.timer);
+              this.ele.innerText = str;
+            }
+          }, 80);
+        }
+      }
+
+
+
+    </script>
+  </body>
+</html>
